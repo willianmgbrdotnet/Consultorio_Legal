@@ -34,5 +34,39 @@ namespace CL.Data.Repository
             //return await context.Clientes.SingleOrDefaultAsync(x => x.Id == id); //"Retorna erro caso tenha duplicata"
             return await context.Clientes.FindAsync(id);
         }
+
+        public async Task<Cliente> InsertClienteAsync(Cliente cliente)
+        {
+            await context.Clientes.AddAsync(cliente);
+            await context.SaveChangesAsync();
+            return cliente;
+        }
+
+        public async Task<Cliente> UpdateClienteAsync(Cliente cliente)
+        {
+            var clienteConsultado = await context.Clientes.FindAsync(cliente.Id);
+            if(clienteConsultado == null)
+            {
+                return null;
+            }
+            /*clienteConsultado.Nome = cliente.Nome;
+            clienteConsultado.DataNascimento = cliente.DataNascimento;
+            context.Clientes.Update(clienteConsultado);*/
+            //A entidade cliente tem apenas 2 propriedades editáveis: nome e dataNascimento.
+            //Pense se tivesse 10, 30 ou mais propriedades. Para não termos que escrever todos
+            //os campos de uma entidade em sua atualização, existe o seguinte comando:
+            context.Entry(clienteConsultado).CurrentValues.SetValues(cliente);
+
+            await context.SaveChangesAsync();
+            return clienteConsultado;
+        }
+
+        public async Task DeleteClienteAsync(int id)
+        {
+            var clienteConsultado = await context.Clientes.FindAsync(id);
+            context.Clientes.Remove(clienteConsultado);
+            await context.SaveChangesAsync();
+        }
+        //Agora, subimos os métodos para a Interface e Implementamos a classe Manager.
     }
 }

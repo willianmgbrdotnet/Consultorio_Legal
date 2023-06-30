@@ -14,6 +14,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore.SqlServer;
+using CL.Manager.Interfaces;
+using CL.Data.Repository;
+using CL.Manager.Implementation;
 
 namespace CL.WebApi
 {
@@ -31,7 +34,18 @@ namespace CL.WebApi
         {
             services.AddSwaggerGen(c => 
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Consultório Legal", Version = "v1" }));
+            
             services.AddControllers();
+
+            //Quando chamar "IClienteRepository", intancie "ClienteRepository".
+            //INVERSÃO DE CONTROLE
+            //Desacoplamento
+            services.AddScoped<IClienteRepository, ClienteRepository>();
+            
+            //Regra de negócio disponibilizada como serviço. 
+            //Proximo passo é injetar na Classe Controller.
+            services.AddScoped<IClienteManager, ClienteManager>();
+
             //Como o banco de dados é o SQL Server, foi instalado o nugget EF CORE.SQLSERVER. 
             services.AddDbContext<ClContext>(options => 
                 //A ConectionStrings será configurada na classe appsettings.json

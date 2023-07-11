@@ -17,6 +17,8 @@ using Microsoft.EntityFrameworkCore.SqlServer;
 using CL.Manager.Interfaces;
 using CL.Data.Repository;
 using CL.Manager.Implementation;
+using FluentValidation.AspNetCore;
+using CL.Manager.Validator;
 
 namespace CL.WebApi
 {
@@ -35,7 +37,15 @@ namespace CL.WebApi
             services.AddSwaggerGen(c => 
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Consultório Legal", Version = "v1" }));
             
-            services.AddControllers();
+            services.AddControllers()
+                // Injeção de Dependência da validação na Controller
+                .AddFluentValidation(c => 
+                    { 
+                        c.RegisterValidatorsFromAssemblyContaining<ClienteValidator>(); 
+                        // Foi adicionado {} dentro da expressão Lambda para tranformá-la em uma coleção de comportamentos.
+                        c.ValidatorOptions.LanguageManager.Culture = new System.Globalization.CultureInfo("pt-BR");
+                    })
+                ;
 
             //Quando chamar "IClienteRepository", intancie "ClienteRepository".
             //INVERSÃO DE CONTROLE

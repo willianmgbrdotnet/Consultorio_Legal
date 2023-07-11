@@ -1,5 +1,6 @@
 ﻿using CL.Core.Domain;
 using CL.Manager.Interfaces;
+using CL.Manager.Validator;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -39,8 +40,24 @@ namespace CL.WebApi.Controllers
         [HttpPost]
         public async Task<IActionResult> Post(Cliente cliente)
         {
+            // A validação abaixo funciona mas geraria um forte acoplamento ao criar uma nova instância. O que vai contra a inversão de controle.
+            // Por isso a validação será feita via Injeção de Dependência na "statup".
+            /*
+            ClienteValidator validator = new ClienteValidator();
+            var validation = validator.Validate(cliente);
+            if(validation.IsValid)
+            {
+                var clienteInserido = await clienteManager.InsertClienteAsync(cliente);
+                //Observar a utilidade do método "CreatedAtAction" e seus recursos.
+                return CreatedAtAction(nameof(Get), new { id = cliente.Id }, cliente);
+            }
+            else
+            {
+                return BadRequest(validation.ToString());
+            }*/
+
             var clienteInserido = await clienteManager.InsertClienteAsync(cliente);
-            //Observar a utilidade do método "CreatedAtAction" e seus recursos.
+            // Observar a utilidade do método "CreatedAtAction" e seus recursos.
             return CreatedAtAction(nameof(Get), new { id = cliente.Id }, cliente);
         }
 
